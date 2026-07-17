@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from userauth import models as user_auth_models
+from users import models as user_auth_models
 
 NOTIFICATION_TYPE_CHOICES = [
     ("general", "General"),
