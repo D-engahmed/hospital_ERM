@@ -1,166 +1,172 @@
-# Hospital Management 
+# 🏥 Hospital ERM (Enterprise Resource Management)
 
-<br/>
-<p align="center">
-  <a href="https://github.com/hamzaezzine/Hospital-Management">
-    <img src="static/img/logo.png" alt="Logo"  height="80">
-  </a>
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-4.2-green.svg)](https://djangoproject.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-  <h3 align="center">Hospital Management</h3>
+> **Enterprise-grade Hospital Management System** — A comprehensive platform connecting doctors, patients, and administrative staff.
 
-  <p align="center">
-    Hospital Management Django Website
-    <br/>
-    <br/>
-    <a href="https://github.com/hamzaezzine/Hospital-Management">View Demo</a>
-    .
-    <a href="https://github.com/hamzaezzine/Hospital-Management/issues">Report Bug</a>
-    .
-    <a href="https://github.com/hamzaezzine/Hospital-Management/issues">Request Feature</a>
-  </p>
-</p>
+---
 
-![Contributors](https://img.shields.io/github/contributors/hamzaezzine/Hospital-Management?color=dark-green) ![Forks](https://img.shields.io/github/forks/hamzaezzine/Hospital-Management?style=social) ![Stargazers](https://img.shields.io/github/stars/hamzaezzine/Hospital-Management?style=social) ![Issues](https://img.shields.io/github/issues/hamzaezzine/Hospital-Management) 
+## 📋 Overview
 
-## Table Of Contents
+Hospital ERM is a full-featured hospital management system built with Django. It streamlines appointment scheduling, patient records, doctor-patient communication, and administrative workflows.
 
-- [Hospital Management](#hospital-management)
-  - [Table Of Contents](#table-of-contents)
-  - [About The Project](#about-the-project)
-  - [Built With](#built-with)
-  - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-  - [Usage](#usage)
-  - [Live Demo](#live-demo)
-  - [Conception](#conception)
-  - [Screenshots](#screenshots)
-  - [Seed Database](#seed-database)
+### نظام إدارة المستشفيات
+نظام متكامل لإدارة المستشفيات والعيادات يربط بين الأطباء والمرضى والإدارة.
 
-## About The Project
+---
 
-The Hospital Management Django project is designed to streamline the interaction between doctors and patients. Doctors have the capability to upload blogs or save them as drafts, allowing them to share valuable medical information and insights. Additionally, the system enables doctors to manage appointments by checking, accepting, or canceling them. This ensures efficient scheduling and communication between healthcare providers and patients.
+## ✨ Features
 
-For patients, the project offers a user-friendly interface for registration and login. Once logged in, patients can access the blog section to read and comment on doctors' posts. The appointment booking feature allows patients to choose a specific doctor based on filters and schedule appointments. Patients can also view their past appointments, creating a comprehensive and accessible record of their medical history. Overall, this Hospital Management system enhances communication and accessibility in the healthcare process for both doctors and patients.
+### ✅ Implemented
+| Module | Description |
+|--------|-------------|
+| **User Management** | Registration, authentication, role-based access (Doctor/Patient) |
+| **Appointment System** | Book, manage, filter, and track appointments with status workflow |
+| **Blog CMS** | Doctors create, publish, and manage medical blogs with categories |
+| **Patient Portal** | Dashboard with appointments overview and profile management |
+| **Doctor Portal** | Dashboard with statistics, charts, and appointment management |
+| **Profile Management** | Personal info, avatar, password change, address management |
+| **Password Reset** | Forgot password flow with email token |
+| **REST API** | Full RESTful API via Django REST Framework |
 
-## Built With
+### 🚧 Planned
+- **EMR (Electronic Medical Records)** — Patient clinical records, vitals, prescriptions
+- **Lab Orders** — Test ordering and results
+- **Billing & Invoicing** — Revenue cycle management
+- **Notifications** — Real-time alerts and reminders
 
-**FRONT-END :**
-- HTML
-- CSS 
- - JS
-- Bootstrap
-- jQuery
+---
 
-**BACK-END :**
- - Python
-- Django
-- SQLite
+## 🛠️ Tech Stack
 
-## Getting Started
+| Tier | Technology |
+|------|------------|
+| **Backend** | Python 3.11+, Django 4.2 |
+| **Frontend** | HTML5, CSS3, Bootstrap 5, jQuery, Chart.js |
+| **API** | Django REST Framework |
+| **Database** | SQLite (dev) / PostgreSQL (production) |
+| **Static Files** | WhiteNoise |
+| **Server** | Gunicorn + Nginx |
+| **Container** | Docker & Docker Compose |
 
-To get started with the Hospital Management System, follow the instructions below.
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
-Make sure you have the following prerequisites installed on your machine:
-
-- Python
+- Python 3.11+
+- pip
 
 ### Installation
 
-1. Clone the repository to your local machine:
-
 ```bash
-   git clone https://github.com/hamzaezzine/Hospital-Management  
-```
+# 1. Clone the repository
+git clone https://github.com/your-org/hospital-erm.git
+cd hospital-erm
 
-2. Create virtual environmenet  :  
-```bash
-   virtualenv env
-   or  
-   python -m venv env
-```
-then start the environmenet :  
-```bash
-  env\Scripts\activate
-```
+# 2. Create virtual environment
+python -m venv venv
+# Windows: venv\Scripts\activate
+# Linux/Mac: source venv/bin/activate
 
-3. Navigate to the project directory:
-```bash 
-cd Hospital-Management
-```
-
-5. Install the required dependencies:
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-7. Apply migrations to set up the database:
-```bash 
+# 4. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 5. Run migrations
 python manage.py migrate
-```
 
-## Usage
-
-1. Start the development server:  
-```bash
-python manage.py runserver
-```
-
-3. Open your web browser and visit http://localhost:8000 to access the Hospital Management System.
-
-4. Follow the on-screen instructions to register/login as a doctor or patient.
-
-5. Explore the features, including blog management, appointment scheduling, and more.
-
-## Live Demo
-Check Website Online here : [Hospital Management](https://hamzaezzine.pythonanywhere.com/)
-
-
-## Conception
-1. Database Schema
-![db](screenshots/db.png)
-
-2. Use Case Diagram : 
-![usecase](screenshots/usecase.PNG)
-
-## Screenshots
-- Login Page : 
-![login](screenshots/login.PNG)
-
-- Register Page : 
-![register](screenshots/register.PNG)
-
-- Profile Page : 
-![profile](screenshots/profile.PNG)
-
-- Blogs : 
-![blogs](screenshots/blogs.PNG)
-
-- Upload Blog Page : 
-![upload_blog](screenshots/upload_blog.PNG)
-
-- Draft Blogs Page : 
-![draft_blog](screenshots/draft_blog.PNG)
-
-- Doctor Appointments Page : 
-![doctor_app](screenshots/doctor_app.PNG)
-
-- Patient Book Appointments Page : 
-![patient_book_app](screenshots/patient_book_app.PNG)
-
-- Patient Confirm Appointments Page : 
-![patient_confirm_app](screenshots/patient_confirm_app.PNG)
-
-- Patient View Appointments Page : 
-![patient_view_app](screenshots/patient_view_app.PNG)
-
-
-## Seed Database
-```bash
-python manage.py loaddata seed/categories.json 
+# 6. Load seed data
+python manage.py loaddata seed/categories.json
 python manage.py loaddata seed/specialities.json
 python manage.py loaddata seed/status.json
 python manage.py loaddata seed/time.json
+
+# 7. Start development server
+python manage.py runserver
 ```
+
+Visit **http://127.0.0.1:8000** to access the application.
+
+---
+
+## 🐳 Docker Deployment
+
+```bash
+docker-compose up --build -d
+```
+
+The application will be available at **http://localhost**.
+
+---
+
+## 📚 API Documentation
+
+The REST API is available at `/api/` with the following endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/users/` | User management |
+| `/api/doctors/` | Doctor profiles |
+| `/api/patients/` | Patient profiles |
+| `/api/specialties/` | Medical specialties |
+| `/api/appointments/` | Appointment management |
+| `/api/blogs/` | Published blogs |
+| `/api/categories/` | Blog categories |
+| `/api/comments/` | Blog comments |
+| `/api/medical-records/` | Patient medical records |
+| `/api/vital-signs/` | Vital signs |
+| `/api/prescriptions/` | Prescriptions |
+| `/api/lab-orders/` | Laboratory orders |
+
+API authentication via session or basic auth.
+
+---
+
+## 📁 Project Structure
+
+```
+hospital_erm/
+├── hospital/          # Django project configuration
+├── users/             # User management (auth, profiles, roles)
+├── doctors/           # Doctor features (blogs, appointments)
+├── patients/          # Patient features (booking, dashboard)
+├── core/              # Shared services (audit logging)
+├── emr/               # Electronic Medical Records
+├── templates/         # HTML templates
+├── static/            # Static assets (CSS, JS, images)
+├── media/             # User uploaded files
+├── seed/              # Database seed data
+├── Dockerfile
+├── docker-compose.yml
+└── nginx.conf
+```
+
+---
+
+## 🔒 Security
+
+- Environment-based configuration (`.env`)
+- CSRF protection
+- Session-based authentication
+- Password validation & hashing
+- SSL/HTTPS ready
+- Security headers (HSTS, XSS, Content-Type)
+- Rate limiting ready (django-axes)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🤝 Support
+
+For enterprise support, customization, or deployment assistance, please contact the development team.

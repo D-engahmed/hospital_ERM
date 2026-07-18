@@ -1,157 +1,130 @@
-from django.shortcuts import render
-
-from multiprocessing import context
+import uuid
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
-from .models import Doctors, Patients, Address , Reste_token , Specialty
-from .helpers import send_email
-import uuid
 
+from .models import Address, Doctors, Patients, Specialty, Reste_token
+from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
+from core.services import EmailService, UserService
+from core.constants import TemplateName, MessageLevel
 
-Users = get_user_model()
+User = get_user_model()
+
 
 def register(request):
-  specialities = Specialty.objects.all()
-  if request.method == 'POST':
-    user_status = request.POST.get('user_config')
-    first_name = request.POST.get('user_firstname')
-    last_name = request.POST.get('user_lastname')
-    profile_pic = ""
+    specialities = Specialty.objects.all()
+    form = RegistrationForm()
 
-    if "profile_pic" in request.FILES:
-      profile_pic = request.FILES['profile_pic']
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            try:
+                address = Address.objects.create(
+                    address_line=cd['address_line'],
+                    region=cd['region'],
+                    city=cd['city'],
+                    code_postal=cd['pincode'],
+                )
+                user = User.objects.create_user(
+                    first_name=cd['first_name'],
+                    last_name=cd['last_name'],
+                    profile_avatar=cd.get('profile_pic') or '',
+                    username=cd['username'],
+                    email=cd['email'],
+                    gender=cd['gender'],
+                    birthday=cd['birthday'],
+                    password=cd['password'],
+                    id_address=address,
+                    is_doctor=(cd['user_config'] == 'Doctor'),
+                )
+                if cd['user_config'] == 'Doctor':
+                    specialty = Specialty.objects.get(name=cd['Speciality'])
+                    Doctors.objects.create(user=user, specialty=specialty, bio=cd.get('bio', ''))
+                else:
+                    Patients.objects.create(user=user, insurance=cd.get('insurance', ''))
 
-    username = request.POST.get('user_id')
-    email = request.POST.get('email')
-    gender = request.POST.get('user_gender')
-    birthday = request.POST.get("birthday")
-    password = request.POST.get('password')
-    confirm_password = request.POST.get('conf_password')
-    address_line = request.POST.get('address_line')
-    region = request.POST.get('region')
-    city = request.POST.get('city')
-    pincode = request.POST.get('pincode')
+                messages.success(request, 'Account created successfully. Please login.', extra_tags=MessageLevel.SUCCESS)
+                return redirect('login')
+            except Exception as e:
+                messages.error(request, f'Registration failed: {str(e)}')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
 
-    if len(password) < 6:
-      messages.error(request, 'Password must be at least 6 characters long.')
-      return render(request, 'users/register.html', context={'user_config': user_status, 'user_firstname': first_name, 'user_lastname': last_name, 'user_id': username, 'email': email, 'user_gender': gender, 'address_line': address_line, 'region': region, 'city': city, 'pincode': pincode})
-
-    if password != confirm_password:
-      messages.error(request, 'Passwords do not match.')
-      return render(request, 'users/register.html', context={'user_config': user_status, 'user_firstname': first_name, 'user_lastname': last_name, 'user_id': username, 'email': email, 'user_gender': gender, 'address_line': address_line, 'region': region, 'city': city, 'pincode': pincode})
-
-    if Users.objects.filter(username=username).exists():
-      messages.error(request, 'Username already exists. Try again with a different username.')
-      return render(request, 'users/register.html', context={'user_config': user_status, 'user_firstname': first_name, 'user_lastname': last_name, 'user_id': username, 'email': email, 'user_gender': gender, 'address_line': address_line, 'region': region, 'city': city, 'pincode': pincode})
-
-    address = Address.objects.create(address_line=address_line, region=region,city=city, code_postal=pincode)
-
-    user = Users.objects.create_user(
-      first_name=first_name,
-      last_name=last_name,
-      profile_avatar=profile_pic,
-      username=username,
-      email=email,
-      gender=gender,
-      birthday=birthday,
-      password=password,
-      id_address=address,
-      is_doctor=(user_status == 'Doctor')
-    )
-      
-    user.save()
-
-    if user_status == 'Doctor':
-      specialty = request.POST.get('Speciality')
-      specialty_name = Specialty.objects.get(name=specialty)
-      bio = request.POST.get('bio')
-      doctor = Doctors.objects.create(user=user, specialty=specialty_name, bio=bio)
-      doctor.save()
-        
-    elif user_status == 'Patient':
-        insurance = request.POST.get('insurance')
-        patient = Patients.objects.create(user=user, insurance=insurance)
-        patient.save()
-
-    messages.success(request, 'Your account has been successfully registered. Please login.', extra_tags='success')
-
-
-  return render(request, 'users/register.html' , {'specialities':specialities})
+    return render(request, TemplateName.REGISTER, {'specialities': specialities, 'form': form})
 
 
 def login_view(request):
-  if request.method == 'POST':
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-
-    user = authenticate(request, username=username, password=password)
-
-    if user is not None:
-      login(request, user)
-
-      if user.is_doctor:
-        return redirect('doctor_dashboard')
-
-      elif Patients.objects.filter(user=user).exists():
-        return redirect('patient_dashboard')
-    else:
-      messages.error(request, 'Incorrect username or password')
-      
-    return render(request, 'users/login.html')
-  
-  return render(request, 'users/login.html')
+    form = LoginForm()
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                request,
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password'],
+            )
+            if user:
+                login(request, user)
+                if user.is_doctor:
+                    return redirect('doctor_dashboard')
+                return redirect('patient_dashboard')
+            messages.error(request, 'Incorrect username or password')
+    return render(request, TemplateName.LOGIN, {'form': form})
 
 
 def forgot_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        user = Users.objects.filter(email=email)
-        if user:
-            token = str(uuid.uuid4())
-            reset = Reste_token.objects.create(
-                user=user[0],
-                email=user[0].email,  
-                token=token  
-            )
-            reset.save()
-            sent = send_email(user[0].email,token)
-            if sent:
-                return render(request, 'users/forgot.html',context={'send_email_succes': 1})
-        else:
-            return render(request, 'users/forgot.html', context={'errorlogin': 1})
-    return render(request, 'users/forgot.html')
+    form = ForgotPasswordForm()
+    context = {'form': form}
 
-def reset_view(request,token):
     if request.method == 'POST':
-        reste = Reste_token.objects.filter(token=token)
-        print(reste)
-        if reste:
-            password = request.POST.get('password')
-            confirm_password = request.POST.get('conf_password')
-            if len(password) < 6:
-                messages.error(request, 'Password must be at least 6 characters long.')
-                return render(request, 'users/reset.html', {'token': token} )
-            print(password)
-            print(confirm_password)
-            if password != confirm_password:
-                messages.error(request, 'password do not match')
-                return render(request, 'users/reset.html', {'token': token} )
-            user = Users.objects.filter(email=reste[0].email).first()
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = UserService.get_or_none(User, email=email)
             if user:
-                hashed_password = make_password(password)
-                user.password = hashed_password
-                user.save()
-                reste.delete()
-                return redirect('login')
+                token = str(uuid.uuid4())
+                Reste_token.objects.create(user=user, email=email, token=token)
+                if EmailService.send_password_reset(email, token):
+                    context['send_email_succes'] = 1
+                    messages.success(request, 'Password reset email sent.')
+                else:
+                    context['errorlogin'] = 1
+                    messages.error(request, 'Failed to send email. Please try again.')
             else:
-                return render(request, 'users/reset.html', {'token': token , 'errorlogin':1} )
-        return render(request, 'users/reset.html', {'token': token} )
-    return render(request, 'users/reset.html',{'token': token})
+                context['errorlogin'] = 1
+                messages.error(request, 'No account found with that email.')
+        context['form'] = form
+
+    return render(request, TemplateName.FORGOT_PASSWORD, context)
+
+
+def reset_view(request, token):
+    form = ResetPasswordForm()
+    context = {'token': token, 'form': form}
+
+    if request.method == 'POST':
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            reset = UserService.get_or_none(Reste_token, token=token)
+            if reset:
+                user = UserService.get_or_none(User, email=reset.email)
+                if user:
+                    user.password = make_password(form.cleaned_data['password'])
+                    user.save(update_fields=['password'])
+                    reset.delete()
+                    messages.success(request, 'Password reset successfully. Please login.')
+                    return redirect('login')
+            context['errorlogin'] = 1
+            messages.error(request, 'Invalid or expired reset token.')
+        context['form'] = form
+
+    return render(request, TemplateName.RESET_PASSWORD, context)
 
 
 @login_required(login_url='/login')
