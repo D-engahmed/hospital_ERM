@@ -1,170 +1,141 @@
 {% extends 'users/base.html' %}
-
-{% block title %}Register Page{% endblock title %}
-
+{% load static %}
+{% block title %}Create Account{% endblock %}
 {% block content %}
-<div class="card shadow-lg mx-auto mt-5" style="max-width: 34rem;">
-  <div class="card-body p-4">
-    <h1 class="fs-4 card-title fw-bold mb-3 text-center">Register</h1>
+<div class="auth-card wide">
+  <div class="auth-header">
+    <img src="{% static 'img/logo.png' %}" alt="Hospital ERM">
+    <h1>Create Account</h1>
+    <p class="text-muted mt-1" style="font-size:0.875rem;">Join our healthcare platform</p>
+  </div>
+  <div class="auth-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if 'success' in message.tags %}success{% else %}danger{% endif %} alert-dismissible fade show d-flex align-items-center" role="alert">
+          <i class="bi bi-{% if 'success' in message.tags %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
 
-    <form method="POST" class="needs-validation" novalidate="" autocomplete="off" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
 
-      {% if messages %}
-        {% for message in messages %}
-          {% if 'success' in message.tags %}
-            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">I am a</label>
+          <select class="form-select" name="user_config" id="user_status">
+            <option value="Doctor">Doctor</option>
+            <option value="Patient" selected>Patient</option>
+          </select>
+        </div>
+
+        <div id="doctor_fields" class="col-12" style="display:none;">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Specialty</label>
+              <select name="Speciality" class="form-select">
+                {% for s in specialities %}
+                <option value="{{ s.name }}">{{ s.name }}</option>
+                {% endfor %}
+              </select>
             </div>
-          {% else %}
-            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="col-6">
+              <label class="form-label">Bio</label>
+              <textarea name="bio" class="form-control" rows="2" placeholder="Brief bio"></textarea>
             </div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
+          </div>
+        </div>
 
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="user_status">Choose Your Status :</label>
-        <select class="form-select" name="user_config" id="user_status">
-          <option value="Doctor" {% if user_config == 'Doctor' %}selected{% endif %}>Doctor</option>
-          <option value="Patient" {% if user_config == 'Patient' %}selected{% endif %}>Patient</option>
-        </select>
-      </div>
+        <div id="patient_fields" class="col-12">
+          <label class="form-label">Insurance</label>
+          <input type="text" name="insurance" class="form-control" placeholder="Insurance provider">
+        </div>
 
-      <div id="specialty_block" class="mb-3" style="display: {% if user_config == 'Doctor' %}block{% else %}none{% endif %}">
-        <label class="mb-2 text-muted" for="specialty">Specialty</label>
-        <select name="Speciality" class="form-select" id="">
-          {% for speciality in specialities %}
-          <option value="{{speciality.name}}">{{speciality.name}}</option>
-          {%endfor%}
-        </select>
-        <div class="invalid-feedback">Specialty is required for doctors</div>
-      </div>
-      
-      <div id="bio_block" class="mb-3" style="display: {% if user_config == 'Doctor' %}block{% else %}none{% endif %}">
-          <label class="mb-2 text-muted" for="bio">Bio</label>
-          <textarea id="bio" class="form-control" name="bio" {% if user_config == 'Doctor' %}required{% endif %}></textarea>
-          <div class="invalid-feedback">Bio is required for doctors</div>
-      </div>
-      
-      <div id="insurance_block" class="mb-3" style="display: {% if user_config == 'Patient' %}block{% else %}none{% endif %}">
-          <label class="mb-2 text-muted" for="insurance">Insurance</label>
-          <input id="insurance" type="text" class="form-control" name="insurance" {% if user_config == 'Patient' %}required{% endif %} />
-          <div class="invalid-feedback">Insurance is required for patients</div>
-      </div>
+        <div class="col-6">
+          <label class="form-label">First Name</label>
+          <input type="text" name="user_firstname" class="form-control" placeholder="John" required>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Last Name</label>
+          <input type="text" name="user_lastname" class="form-control" placeholder="Doe" required>
+        </div>
 
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="id_user">Username</label>
-        <input id="id_user" type="text" class="form-control" name="user_id" value="{{ user_id }}" required autofocus />
-        <div class="invalid-feedback">username is required</div>
-      </div>
+        <div class="col-6">
+          <label class="form-label">Username</label>
+          <input type="text" name="user_id" class="form-control" placeholder="johndoe" required>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+        </div>
 
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="first_name">First Name</label>
-        <input id="first_name" type="text" class="form-control" name="user_firstname" value="{{ user_firstname }}" required autofocus />
-        <div class="invalid-feedback">First Name is required</div>
-      </div>
+        <div class="col-4">
+          <label class="form-label">Gender</label>
+          <select name="user_gender" class="form-select">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div class="col-4">
+          <label class="form-label">Birthday</label>
+          <input type="date" name="birthday" class="form-control">
+        </div>
+        <div class="col-4">
+          <label class="form-label">Avatar</label>
+          <input type="file" name="profile_pic" class="form-control">
+        </div>
 
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="last_name">Last Name</label>
-        <input id="last_name" type="text" class="form-control" name="user_lastname" value="{{ user_lastname }}" required autofocus />
-        <div class="invalid-feedback">Last Name is required</div>
-      </div>
-      
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="select_gender">Gender</label>
-        <select class="form-select" aria-label="Default select example" name="user_gender" id="select_gender">
-          <option value="Male" {% if user_gender == 'Male' %}selected{% endif %}>Male</option>
-          <option value="Female" {% if user_gender == 'Female' %}selected{% endif %}>Female</option>
-        </select>
-      </div>   
-      
-      <div class="mb-3" >
-        <label class="mb-2 text-muted" for="birthday">Birthday</label>
-        <input id="birthday" type="date" class="form-control" name="birthday" value="{{ birthday }}" required />
-        <div class="invalid-feedback">Birthday is invalid</div>
-      </div>
-      
-      <div class="mb-3" >
-        <label class="mb-2 text-muted" for="email">E-mail Address</label>
-        <input id="email" type="email" class="form-control" name="email" value="{{ email }}" required />
-        <div class="invalid-feedback">Email is invalid</div>
+        <div class="col-6">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="At least 6 characters" required minlength="6">
+        </div>
+        <div class="col-6">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="conf_password" class="form-control" placeholder="Repeat password" required>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Address</label>
+          <input type="text" name="address_line" class="form-control mb-2" placeholder="Address line" required>
+          <div class="row g-2">
+            <div class="col-4"><input type="text" name="region" class="form-control" placeholder="Region"></div>
+            <div class="col-4"><input type="text" name="city" class="form-control" placeholder="City"></div>
+            <div class="col-4"><input type="text" name="pincode" class="form-control" placeholder="Postal code"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="password">Password</label>
-        <input id="password" type="password" class="form-control" name="password" required />
-        <div class="invalid-feedback">Password is required</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="conf__password">Confirm Password</label>
-        <input id="conf__password" type="password" class="form-control" name="conf_password" required />
-        <div class="invalid-feedback">Password is required</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="AddressLine">Address Line</label>
-        <input id="AddressLine" type="text" class="form-control mb-2" name="address_line" value="{{ address_line }}" placeholder="Address Line" required autofocus />
-        <input id="Region" type="text" class="form-control mb-2" name="region" value="{{ region }}" placeholder="Region" required autofocus />
-        <input id="City" type="text" class="form-control mb-2" name="city" value="{{ city }}" placeholder="City" required autofocus />
-        <input id="Pincode" type="text" class="form-control" name="pincode" value="{{ pincode }}" placeholder="Code Postal" required autofocus />
-        <div class="invalid-feedback">Address is required</div>
-      </div>
-      
-      <div class="mb-3 col-12 col-md-12">
-        <label for="pic" class="form-label text-muted">Profile Avatar</label>
-        <input type="file" class="form-control p-3"  name="profile_pic" id="pic"  required>
-      </div>
-
-      <p class="form-text text-muted mb-3">
-        By registering you agree with our terms and condition.
+      <p class="text-muted mt-3 mb-3" style="font-size:0.8125rem;">
+        By registering you agree to our terms and conditions.
       </p>
 
-      <div class="align-items-center d-flex">
-        <button type="submit" class="btn btn-primary ms-auto primary-color-background">
-          Register
-        </button>
-      </div>
+      <button type="submit" class="btn btn-primary w-100">Create Account</button>
     </form>
   </div>
-  <div class="card-footer py-3 border-0">
-    <div class="text-center">
-      Already have an account?
-      <a href="{% url 'login' %}" class="text-dark secondary-color">Login</a>
-    </div>
+  <div class="auth-footer">
+    Already have an account? <a href="{% url 'login' %}">Sign In</a>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    toggleFields();
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('user_status');
+  var docFields = document.getElementById('doctor_fields');
+  var patFields = document.getElementById('patient_fields');
 
-    document.getElementById('user_status').addEventListener('change', function() {
-      toggleFields();
-    });
-
-    function toggleFields() {
-      var userConfig = document.getElementById('user_status').value;
-      var specialtyBlock = document.getElementById('specialty_block');
-      var bioBlock = document.getElementById('bio_block');
-      var insuranceBlock = document.getElementById('insurance_block');
-
-      if (userConfig === 'Doctor') {
-        specialtyBlock.style.display = 'block';
-        bioBlock.style.display = 'block';
-        insuranceBlock.style.display = 'none';
-      } else if (userConfig === 'Patient') {
-        specialtyBlock.style.display = 'none';
-        bioBlock.style.display = 'none';
-        insuranceBlock.style.display = 'block';
-      }
+  function toggle() {
+    if (sel.value === 'Doctor') {
+      docFields.style.display = 'block';
+      patFields.style.display = 'none';
+    } else {
+      docFields.style.display = 'none';
+      patFields.style.display = 'block';
     }
-  });
+  }
+  toggle();
+  sel.addEventListener('change', toggle);
+});
 </script>
-
-
-{% endblock content %}
+{% endblock %}

@@ -1,60 +1,71 @@
-{% extends 'patients/base.html' %} 
-{% load static %} 
-{% block title %} Dashboard {% endblock title %} 
-{% block page_title %} Patient Dashboard {% endblock page_title %} 
+{% extends 'patients/base.html' %}
+{% load static %}
+{% block title %}Confirm Booking{% endblock %}
+{% block page_title %}Confirm Your Appointment{% endblock %}
 {% block content %}
-<main>
-  <h2 class="dash-title">Appointment Booking Confirmation</h2>
-  <section class="recent">
-    <div class="table-div bg-white">
-      <div >
-        <div class="container">
-          <div class="row">
-            <div class="col-md-10 border p-4 shadow text-black" style="width: 100%; border-radius: 20px">
-              <div class="col-12 text-black">
-                <h3>Doctor Name: {{ doctor.user.last_name }} {{ doctor.user.first_name }}</h3>
-              </div>
-              <form method="POST" class="needs-validation" nonalidate="" autocomplete="off" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label for="first-name" style="color: black">First Name:</label><br />
-                    <input type="text" class="form-control" name="foname" id="first-name" value="{{ request.user.first_name }}" disabled />
-                  </div>
-                  <div class="col-md-6">
-                    <label for="last-name" style="color: black">Last Name:</label><br />
-                    <input type="text" class="form-control" id="last-name" name="loname" value="{{ request.user.last_name }}" disabled />
-                  </div>
-                  <div class="col-md-6">
-                    <label for="dates" style="color: black">Select Date:</label><br />
-                    <input type="date" class="form-control" id="dates" name="date" placeholder="Enter Date" required />
-                  </div>
-                  <div class="col-md-6">
-                    <label for="times" style="color: black">Select Time:</label><br />
-                    <select name="time" class="form-select">
-                      {% for time in times %}
-                      <option value="{{time.time}}">{{time.time}}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-                  <div class="col-md-12 mt-3">
-                    <label for="spec" style="color: black">Summary:</label><br />
-                    <input type="text" class="form-control" name="summary" id="spec" required />
-                  </div>
-                  <div class="col-md-12 mt-3">
-                    <label for="message" style="color: black">Description:</label><br />
-                    <textarea class="form-control" id="message" name="description"style="resize: vertical;"></textarea>
-                  </div>
-                  <div class="col-12 mt-5">
-                    <button type="submit" class="btn btn-success float-end">Book Appointment</button>
-                  </div>
-                </div>
-              </form>
-            </div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card-custom">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-light rounded-3">
+          <img src="{{ doctor.user.profile_avatar.url }}" class="rounded-circle" style="width:64px;height:64px;object-fit:cover;">
+          <div>
+            <h5 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h5>
+            <span class="badge bg-primary-light text-primary" style="background:var(--primary-light);color:var(--primary);">{{ doctor.specialty.name }}</span>
+            <p class="text-muted mb-0 mt-1" style="font-size:0.875rem;">{{ doctor.user.email }}</p>
           </div>
         </div>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" value="{{ request.user.first_name }}" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" value="{{ request.user.last_name }}" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Time</label>
+              <select name="time" class="form-select" required>
+                <option value="">Select time...</option>
+                {% for t in times %}
+                <option value="{{ t.time }}">{{ t.time }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Summary</label>
+              <input type="text" name="summary" class="form-control" placeholder="Brief reason for visit" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" rows="3" placeholder="Additional details..."></textarea>
+            </div>
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg me-1"></i>Confirm Booking</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-  </section>
-</main>
+  </div>
+</div>
+
 {% endblock %}

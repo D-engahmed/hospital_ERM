@@ -1,196 +1,93 @@
 {% extends base_template %}
-
 {% load static %}
-
-{% block title %} Blog Article {% endblock title %}
-
-{% block page_title %}
-  {{ blog.title|slice:":50"|wordwrap:50|default:'' }}{% if blog.title|length > 50 %}...{% endif %}
-{% endblock page_title %}
-
+{% block title %}{{ blog.title }}{% endblock %}
+{% block page_title %}{{ blog.title }}{% endblock %}
 {% block content %}
-<main>
-  <section class="blog_area sec_pad" style="margin-top:-8%;">
-    <div class="container">
 
-      <div class="row">
-        <div class="col-lg-8">
-          <div class="blog_list_item mb_50">
-            <img class="img-fluid" src="{{blog.thumbnail.url}}" alt="" style="height:100%;width:100%;">
-            <div class="blog_content">
-              <div class="post_date">
-                <h2>{{blog.posted_at|date:'d'}} <span>{{blog.posted_at|date:'F'}}</span></h2>
-              </div>
-              <div class="entry_post_info">
-                By: <a href="#">{{blog.doctor}}</a>
-                <a href="#">{{blog.id_category}}</a>
-              </div>
-              <a href="#">
-                <h5 class="f_p f_size_20 f_500 t_color mb_20">Title : &nbsp;{{blog.title}}</h5>
-              </a>
-              <p class="f_400 mb-30">{{blog.description | safe}}</p>
-              <a href="#">
-                <h5 class="f_p f_size_20 f_500 t_color mb_20">Summary </h5>
-                <p class="f_400 mb-30">{{blog.summary | safe}}</p>
-              </a>
-            </div>
-          </div>
+<div class="row g-4">
+  <div class="col-12 col-lg-8">
+    <div class="card-custom">
+      <div class="card-body">
+        {% if blog.thumbnail %}
+        <img src="{{ blog.thumbnail.url }}" class="w-100 rounded-3 mb-4" style="max-height:400px;object-fit:cover;" alt="">
+        {% endif %}
 
-          <!-- End Recent Posts -->
-          <div class="blog_post">
-            <div class="widget_title">
-              <h3 class="f_p f_size_20 t_color3">Related Post</h3>
-              <div class="border_bottom"></div>
-            </div>
-
-            <div class="row">
-              {% for blog in related_blogs %}
-
-              <div class="col-lg-4 col-sm-6">
-                <div class="blog_post_item">
-                  <div class="blog_img">
-                    <a href="/blog/{{blog.blog_id}}">
-                      <img src="{{blog.thumbnail.url}}" alt="">
-                    </a>
-                  </div>
-                  <div class="blog_content">
-                    <div class="entry_post_info">
-                      <a href="#">{{blog.posted_at}}</a>
-                    </div>
-                    <a href="/blog/{{blog.title}}">
-                      <h5 class="f_p f_size_16 f_500 t_color">{{blog.title}}</h5>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {% endfor %}
-              <div class="pagination">
-                <span class="step-links">
-                  {% if blogs.has_previous %}
-                    <a href="?page=1">&laquo;First</a>
-                    <a href="?page={{ blogs.previous_page_number }}">Previous</a>
-                  {% endif %}
-
-                  {% comment %} <span class="current">
-                    Page {{ blogs.number }} of {{ blogs.paginator.num_pages }}.
-                  </span> {% endcomment %}
-
-                  {% if blogs.has_next %}
-                  <a href="?page={{ blogs.next_page_number }}">Next</a>
-                  <a href="?page={{ blogs.paginator.num_pages }}">Last &raquo;</a>
-                  {% endif %}
-                </span>
-              </div>
-            </div>
-          </div>
-          <!-- End Recent Posts -->
-
-          <!-- Comment -->
-
-          <div class="widget_title mt_100">
-            <h3 class="f_p f_size_20 t_color3"> Comments( {{ comments.count }} )</h3>
-            <div class="border_bottom"></div>
-          </div>
-          <ul class="comment-box list-unstyled mb-0">
-            {% for comment in comments %}
-              <li class="post_comment">
-                <div class="media post_author mt_60">
-                  <div class="media-left">
-                    <img class="rounded-circle" src="{{ comment.user.profile_avatar.url }}" alt=""  style="width: 70px; height: 70px;">
-                    <a href="#" class="replay"><i class="ti-share"></i></a>
-                </div>
-                  <div class="media-body">
-                    <h5 class="f_p t_color3 f_size_18 f_500">{{ comment.user.username }}</h5>
-                    <h6 class="f_p f_size_15 f_400 mb_20">{{ comment.commented_at }}</h6>
-                    <p>{{ comment.content }}</p>
-                  </div>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-
-          <!-- Comment Form section -->
-          <div class="widget_title mt_100">
-            <h3 class="f_p f_size_20 t_color3">Leave a Comment</h3>
-            <div class="border_bottom"></div>
-          </div>
-
-          <form class="get_quote_form row" action="{% url 'comment' %}" method="post">
-            {% csrf_token %}
-            <div class="col-md-12 form-group">
-              <textarea class="form-control message" name='comment' placeholder="Comment"></textarea>
-            </div>
-            <div class="col-md-12 form-group">
-              <input type="hidden" class="form-control" name='id' value="{{blog.blog_id}}" id="website"
-                placeholder="Website (optional)">
-            </div>
-
-            <div class="col-md-12">
-              <button class="btn btn_three btn_hover f_size_15 f_500" type="submit">Post Comment</button>
-            </div>
-          </form>
-
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge bg-primary-light text-primary" style="background:var(--primary-light);color:var(--primary);">{{ blog.id_category.name }}</span>
+          <small class="text-muted"><i class="bi bi-calendar me-1"></i>{{ blog.posted_at|date:"F d, Y" }}</small>
+          <small class="text-muted"><i class="bi bi-person me-1"></i>Dr. {{ blog.doctor.user.get_full_name }}</small>
         </div>
 
-
-        <div class="col-lg-4">
-          <div class="blog-sidebar">
-            <div class="widget sidebar_widget widget_search">
-
-              <form action="{% url 'search_blogs' %}" class="search-form input-group" method='get'>
-                <input type="search" class="form-control widget_input" name='keyword' placeholder="Search Here">
-                <button type="submit"><i class="ti-search"></i></button>
-              </form>
-
-            </div>
-
-            <div class="widget sidebar_widget widget_recent_post mt_60">
-              <div class="widget_title">
-                  <h3 class="f_p f_size_20 t_color3">Recent blogs</h3>
-                  <div class="border_bottom"></div>
-              </div>
-          
-              {% for recent_blog in recent_blogs %}
-                  <div class="media post_item">
-                      <a href="/blog/{{recent_blog.blog_id}}">
-                          <img src="{{recent_blog.thumbnail.url}}" style="margin-left:5%;" class='img-responsive img-fluid img-thumbnail' height="75" width="200" alt="">
-                      </a>
-                      <div class="media-body">
-                          <a href="/blog/{{recent_blog.blog_id}}">
-                              <h3 class="f_size_16 f_p f_400"><b>Desc :</b> &nbsp;{{recent_blog.title}}</h3>
-                          </a>
-                          <div class="entry_post_info">
-                              By: {{recent_blog.doctor}} / {{recent_blog.posted_at}}
-                          </div>
-                      </div>
-                  </div>
-              {% endfor %}
-          </div>
-          
-
-            <div class="widget sidebar_widget widget_categorie mt_60">
-              <div class="widget_title">
-                <h3 class="f_p f_size_20 t_color3">Categories</h3>
-                <div class="border_bottom"></div>
-              </div>
-              <ul class="list-unstyled">
-                {% for category in categories %}
-                  <li> 
-                    <a href="/category/{{category.name}}">
-                      <span>{{category.name}}</span>
-                      <em></em></a> 
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
-
-          </div>
-        </div>
-
+        <h3 class="fw-bold mb-3">{{ blog.title }}</h3>
+        <p class="text-muted fst-italic">{{ blog.summary }}</p>
+        <hr>
+        <div style="line-height:1.8;">{{ blog.description|linebreaks }}</div>
       </div>
     </div>
-  </section>
-</main>
+
+    <!-- Comments -->
+    <div class="card-custom mt-3">
+      <div class="card-header">Comments ({{ comments|length }})</div>
+      <div class="card-body">
+        {% if comments %}
+          {% for comment in comments %}
+          <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+            <img src="{{ comment.user.profile_avatar.url }}" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;" alt="">
+            <div>
+              <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+              <small class="text-muted ms-2">{{ comment.commented_at|date:"d M Y" }}</small>
+              <p class="mb-0 mt-1">{{ comment.content }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted mb-0">No comments yet.</p>
+        {% endif %}
+
+        <hr>
+        <form method="post" action="{% url 'comment' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id" value="{{ blog.blog_id }}">
+          <div class="mb-2">
+            <textarea name="comment" class="form-control" rows="2" placeholder="Write a comment..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-12 col-lg-4">
+    {% if related_blogs %}
+    <div class="card-custom mb-3">
+      <div class="card-header">Related Articles</div>
+      <div class="card-body p-0">
+        {% for rb in related_blogs %}
+        <a href="{% url 'blog' rb.blog_id %}" class="text-decoration-none">
+          <div class="p-3 border-bottom">
+            <h6 class="mb-1 text-dark">{{ rb.title|truncatechars:50 }}</h6>
+            <small class="text-muted">{{ rb.posted_at|date:"d M Y" }}</small>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card-custom">
+      <div class="card-header">Categories</div>
+      <div class="card-body p-0">
+        {% for cat in categories %}
+        <a href="{% url 'categories' cat.name %}" class="text-decoration-none">
+          <div class="px-3 py-2 border-bottom">
+            <span class="text-dark">{{ cat.name }}</span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

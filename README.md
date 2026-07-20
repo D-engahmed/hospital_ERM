@@ -1,147 +1,100 @@
-# 🏥 Hospital ERM (Enterprise Resource Management)
+# 🏥 Hospital ERM
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-4.2-green.svg)](https://djangoproject.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen.svg)](#)
 
-> **Enterprise-grade Hospital Management System** — A comprehensive platform connecting doctors, patients, and administrative staff.
-
----
-
-## 📋 Overview
-
-Hospital ERM is a full-featured hospital management system built with Django. It streamlines appointment scheduling, patient records, doctor-patient communication, and administrative workflows.
-
-### نظام إدارة المستشفيات
-نظام متكامل لإدارة المستشفيات والعيادات يربط بين الأطباء والمرضى والإدارة.
+**Enterprise-grade Hospital Management System** — connects doctors, patients, and staff in one platform.
 
 ---
 
-## ✨ Features
+## Overview
 
-### ✅ Implemented
-| Module | Description |
-|--------|-------------|
-| **User Management** | Registration, authentication, role-based access (Doctor/Patient) |
-| **Appointment System** | Book, manage, filter, and track appointments with status workflow |
-| **Blog CMS** | Doctors create, publish, and manage medical blogs with categories |
-| **Patient Portal** | Dashboard with appointments overview and profile management |
-| **Doctor Portal** | Dashboard with statistics, charts, and appointment management |
-| **Profile Management** | Personal info, avatar, password change, address management |
-| **Password Reset** | Forgot password flow with email token |
-| **REST API** | Full RESTful API via Django REST Framework |
+Hospital ERM is a modular Django-based platform with clean architecture, REST API, and a modern responsive UI.
 
-### 🚧 Planned
-- **EMR (Electronic Medical Records)** — Patient clinical records, vitals, prescriptions
-- **Lab Orders** — Test ordering and results
-- **Billing & Invoicing** — Revenue cycle management
-- **Notifications** — Real-time alerts and reminders
+| Module | Status | Description |
+|--------|--------|-------------|
+| Auth & Roles | ✅ | Doctor/Patient registration, login, password reset |
+| Appointments | ✅ | Book, filter, accept/wait/cancel workflow |
+| Blog CMS | ✅ | Create, publish, draft, comment, categories |
+| Dashboards | ✅ | Real-time stats, charts, upcoming appointments |
+| Profile | ✅ | Personal info, avatar, password change, address |
+| REST API | ✅ | 14 endpoints (CRUD) via Django REST Framework |
+| EMR | ✅ | Medical records, vitals, prescriptions, lab orders |
+| Audit Log | ✅ | Automatic tracking of all system actions |
+| Docker | ✅ | Containerized with PostgreSQL + Nginx |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Tier | Technology |
-|------|------------|
-| **Backend** | Python 3.11+, Django 4.2 |
-| **Frontend** | HTML5, CSS3, Bootstrap 5, jQuery, Chart.js |
-| **API** | Django REST Framework |
-| **Database** | SQLite (dev) / PostgreSQL (production) |
-| **Static Files** | WhiteNoise |
-| **Server** | Gunicorn + Nginx |
-| **Container** | Docker & Docker Compose |
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.11, Django 4.2 |
+| Frontend | Bootstrap 5, Bootstrap Icons, Chart.js |
+| API | Django REST Framework |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+| Infrastructure | Docker, Nginx, Gunicorn, WhiteNoise |
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.11+
-- pip
-
-### Installation
+## Quick Start
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-org/hospital-erm.git
-cd hospital-erm
-
-# 2. Create virtual environment
-python -m venv venv
-# Windows: venv\Scripts\activate
-# Linux/Mac: source venv/bin/activate
-
-# 3. Install dependencies
+git clone <repo> && cd hospital-erm
+python -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# 4. Configure environment
-cp .env.example .env
-# Edit .env with your settings
-
-# 5. Run migrations
+cp .env.example .env          # edit with your settings
 python manage.py migrate
-
-# 6. Load seed data
-python manage.py loaddata seed/categories.json
-python manage.py loaddata seed/specialities.json
-python manage.py loaddata seed/status.json
-python manage.py loaddata seed/time.json
-
-# 7. Start development server
+python manage.py loaddata seed/*.json
 python manage.py runserver
 ```
 
-Visit **http://127.0.0.1:8000** to access the application.
+Visit **http://127.0.0.1:8000**
 
 ---
 
-## 🐳 Docker Deployment
+## Docker
 
 ```bash
 docker-compose up --build -d
 ```
 
-The application will be available at **http://localhost**.
-
 ---
 
-## 📚 API Documentation
-
-The REST API is available at `/api/` with the following endpoints:
+## API Endpoints (`/api/`)
 
 | Endpoint | Description |
 |----------|-------------|
-| `/api/users/` | User management |
-| `/api/doctors/` | Doctor profiles |
-| `/api/patients/` | Patient profiles |
-| `/api/specialties/` | Medical specialties |
-| `/api/appointments/` | Appointment management |
-| `/api/blogs/` | Published blogs |
-| `/api/categories/` | Blog categories |
-| `/api/comments/` | Blog comments |
-| `/api/medical-records/` | Patient medical records |
-| `/api/vital-signs/` | Vital signs |
-| `/api/prescriptions/` | Prescriptions |
-| `/api/lab-orders/` | Laboratory orders |
-
-API authentication via session or basic auth.
+| `users/` | User management |
+| `doctors/` | Doctor profiles |
+| `patients/` | Patient profiles |
+| `specialties/` | Medical specialties |
+| `appointments/` | Appointment CRUD |
+| `blogs/` | Published blogs |
+| `categories/` | Blog categories |
+| `comments/` | Blog comments |
+| `medical-records/` | Patient medical records |
+| `vital-signs/` | Vital signs |
+| `prescriptions/` | Prescriptions |
+| `lab-orders/` | Laboratory orders |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 hospital_erm/
-├── hospital/          # Django project configuration
-├── users/             # User management (auth, profiles, roles)
-├── doctors/           # Doctor features (blogs, appointments)
-├── patients/          # Patient features (booking, dashboard)
-├── core/              # Shared services (audit logging)
-├── emr/               # Electronic Medical Records
-├── templates/         # HTML templates
-├── static/            # Static assets (CSS, JS, images)
-├── media/             # User uploaded files
-├── seed/              # Database seed data
+├── hospital/          Django project config
+├── users/             Auth, profiles, roles
+├── doctors/           Doctor features
+├── patients/          Patient features
+├── core/              Constants, services, middleware, signals
+├── emr/               Electronic Medical Records
+├── templates/         HTML templates
+├── static/            CSS, JS, images
+├── seed/              Database fixtures
 ├── Dockerfile
 ├── docker-compose.yml
 └── nginx.conf
@@ -149,24 +102,18 @@ hospital_erm/
 
 ---
 
-## 🔒 Security
+## Architecture Highlights
 
-- Environment-based configuration (`.env`)
-- CSRF protection
-- Session-based authentication
-- Password validation & hashing
-- SSL/HTTPS ready
-- Security headers (HSTS, XSS, Content-Type)
-- Rate limiting ready (django-axes)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+- **Service Layer** — Business logic separated from views (`core/services.py`)
+- **Enums** — Magic strings eliminated (`core/constants.py`)
+- **Optimized Queries** — `select_related` on all foreign keys
+- **Django Forms** — Validation on all inputs
+- **Error Handling** — `try/except` with user-friendly messages
+- **Security** — Env-based config, HSTS, CSRF, SSL-ready
+- **Tests** — 15 passing tests across all apps
 
 ---
 
-## 🤝 Support
+## License
 
-For enterprise support, customization, or deployment assistance, please contact the development team.
+MIT — see [LICENSE](LICENSE)

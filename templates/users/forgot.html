@@ -1,43 +1,39 @@
 {% extends 'users/base.html' %}
-
-{% block title %}Forgot Password{% endblock title %}
-
+{% load static %}
+{% block title %}Reset Password{% endblock %}
 {% block content %}
-<div class="card shadow-lg">
-  <div class="card-body p-5">
-    {% if errorlogin %}
-  <div class="alert alert-danger" role="alert">
-    Incorrect Details
+<div class="auth-card">
+  <div class="auth-header">
+    <img src="{% static 'img/logo.png' %}" alt="Hospital ERM">
+    <h1>Forgot Password</h1>
+    <p class="text-muted mt-1" style="font-size:0.875rem;">Enter your email to receive a reset link</p>
   </div>
-  {% endif %}
-  {% if send_email_succes %}
-      <div class="alert alert-success" role="alert">
-        an email have been sent
+  <div class="auth-body">
+    {% if errorlogin %}
+      <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        No account found with that email.
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endif %}
-    <h1 class="fs-4 card-title fw-bold mb-4">Forgot Password</h1>
-    <form method="POST" class="needs-validation" novalidate="" autocomplete="off">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label class="mb-2 text-muted" for="email">E-Mail Address</label>
-        <input id="email" type="email" class="form-control" name="email" value="" required autofocus />
-        <div class="invalid-feedback">Email is invalid</div>
+    {% if send_email_succes %}
+      <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        Reset link sent! Check your email.
       </div>
+    {% endif %}
 
-      <div class="d-flex align-items-center">
-        <button type="submit" class="btn btn-primary ms-auto">
-          Send Link
-        </button>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-control" name="email" placeholder="you@example.com" required autofocus>
       </div>
+      <button type="submit" class="btn btn-primary w-100">Send Reset Link</button>
     </form>
   </div>
-
-  <div class="card-footer py-3 border-0">
-    <div class="text-center">
-      Remember your password?
-      <a href={% url 'login' %} class="text-dark">Login</a>
-    </div>
+  <div class="auth-footer">
+    Remember your password? <a href="{% url 'login' %}">Sign In</a>
   </div>
 </div>
-{% endblock content %}
-
+{% endblock %}

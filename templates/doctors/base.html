@@ -1,106 +1,94 @@
 {% load static %}
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-  <title>{% block title %}{% endblock title %} - Hospital Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %} — Hospital ERM</title>
   <link rel="icon" type="image/x-icon" href="{% static 'img/icon_app.png' %}">
-
-  <link  href="{% static 'css/style-appointments.css' %}" rel="stylesheet">
-  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"/>
-  <link href="{% static 'css/base-style.css' %}" rel="stylesheet"/>
-  {% comment %} <link href="{% static 'css/themify-icons.css' %}" rel="stylesheet"/> {% endcomment %}
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
-  <link  href="{% static 'css/style.css' %}" rel="stylesheet">
-  <link  href="{% static 'css/bootstrap-icons.css' %}" rel="stylesheet">
-  <link  href="{% static 'css/jquery.dataTables.min.css' %}" rel="stylesheet">
-  <link  href="{% static 'css/styleblog.css' %}" rel="stylesheet">
-  <link  href="{% static 'css/styleblog-responsive.css' %}" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="{% static 'css/hospital.css' %}" rel="stylesheet">
+  {% block extra_head %}{% endblock %}
 </head>
-
 <body>
-  <input type="checkbox" id="sidebar-toggle">
-  <div class="sidebar">
-    <div class="sidebar-header pt-4">
-      <div class="text-center my-">
-        <img src="{% static 'img/white-logo.png' %}" alt="logo" class="img-fluid" style="max-width: 170px;" />
-      </div>
-      <label for="sidebar-toggle" class="ti-menu-alt"></label>
-    </div>
-      
-    <div class="sidebar-menu">
-      <ul>
-        <li>
-          <a href="{% url 'doctor_dashboard' %}">
-            <i class="bi bi-speedometer2 me-2"></i>
-            <span>Dashboard</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'doctor_profile' %}">
-            <i class="bi bi-person-circle me-2"></i> 
-            <span>Profile</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'doctor_blogs' %}">
-            <i>&#9777;&nbsp;&nbsp; </i> 
-            <span>Blogs</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'myblogs' %}">
-            <i>&#9729;&nbsp;&nbsp;</i>
-            <span>My Blogs</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'upload_blog' %}">
-            <i class="bi bi-cloud-arrow-up-fill"></i>
-            <span>&nbsp;&nbsp;Upload Blog</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'doctor_drafts' %}">
-            <i class="bi bi-envelope-open"></i>
-            <span>&nbsp;&nbsp;My Drafts</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'view_appointments' %}">
-            <i class="bi bi-file-medical-fill"></i> 
-            <span>&nbsp;&nbsp;view appointments</span>
-          </a>
-        </li>
-        
-        <br><br>
+  <input type="checkbox" id="sidebar-toggle" hidden>
 
-        <li>
-            <a href="{% url 'logout' %}" class="logout text-dark"data-bs-toggle="tooltip" data-bs-placement="right" title="logout" >
-              <i class="bi bi-box-arrow-left me-3"></i> 
-              <span class="d-none d-md-inline">Log Out</span>
-            </a>
-        </li>
-      </ul>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="{% static 'img/white-logo.png' %}" alt="Hospital ERM">
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">Main</div>
+        <a href="{% url 'doctor_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'doctor_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{% url 'doctor_profile' %}" class="nav-item {% if request.resolver_match.url_name == 'doctor_profile' %}active{% endif %}">
+          <i class="bi bi-person-circle"></i> Profile
+        </a>
+
+        <div class="nav-section">Blogs</div>
+        <a href="{% url 'doctor_blogs' %}" class="nav-item {% if request.resolver_match.url_name == 'doctor_blogs' %}active{% endif %}">
+          <i class="bi bi-newspaper"></i> All Blogs
+        </a>
+        <a href="{% url 'myblogs' %}" class="nav-item {% if request.resolver_match.url_name == 'myblogs' %}active{% endif %}">
+          <i class="bi bi-pencil-square"></i> My Blogs
+        </a>
+        <a href="{% url 'upload_blog' %}" class="nav-item {% if request.resolver_match.url_name == 'upload_blog' %}active{% endif %}">
+          <i class="bi bi-cloud-arrow-up"></i> Upload Blog
+        </a>
+        <a href="{% url 'doctor_drafts' %}" class="nav-item {% if request.resolver_match.url_name == 'doctor_drafts' %}active{% endif %}">
+          <i class="bi bi-envelope-open"></i> Drafts
+        </a>
+
+        <div class="nav-section">Appointments</div>
+        <a href="{% url 'view_appointments' %}" class="nav-item {% if request.resolver_match.url_name == 'view_appointments' %}active{% endif %}">
+          <i class="bi bi-calendar-check"></i> Appointments
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="nav-item">
+          <i class="bi bi-box-arrow-left"></i> Log Out
+        </a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="main-header">
+        <div class="d-flex align-items-center gap-3">
+          <label for="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+          </label>
+          <h2>{% block page_title %}{% endblock %}</h2>
+        </div>
+        <div class="header-actions">
+          <a href="{% url 'doctor_profile' %}" class="header-avatar">
+            <img src="{{ request.user.profile_avatar.url }}" alt="Avatar">
+            <span>{{ request.user.get_full_name|default:request.user.username|truncatechars:15 }}</span>
+          </a>
+        </div>
+      </header>
+
+      <div class="page-content">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-custom alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center" role="alert">
+              <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </div>
     </div>
   </div>
 
-  <div class="main-content">
-    <header class="d-flex  align-items-center">
-      <h2>{% block page_title %}{% endblock page_title %}</h2>
-      <a href="{% url 'doctor_profile' %}">
-        <img src="{{ request.user.profile_avatar.url }}" style="width: 30px; height: 30px; border-radius: 50%; overflow: hidden; background-color: blue; display: inline-block; vertical-align: middle; border: 3px solid #424a5b;">
-        <span class="fw-bold fs-6 ms-1 text-dark me-4">{{ request.user.username|safe | truncatechars:"10" }}</span>
-      </a>
-    </header>
-    {% block content %}
-    {% endblock content %}
-
-  <script src="{% static 'js/jquery.min.js' %}"></script>
-  <script src="{% static 'js/poper.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
 </html>

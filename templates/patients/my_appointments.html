@@ -1,116 +1,123 @@
 {% extends 'patients/base.html' %}
 {% load static %}
-
-{% block title %} Profile {% endblock title %}
-{% block page_title %} Patient Profile {% endblock page_title %}
-
+{% block title %}My Appointments{% endblock %}
+{% block page_title %}My Appointments{% endblock %}
 {% block content %}
-<main>
-    <section class="recent">
-        <div class="filter-section my-2">
-            <form method="get" class="d-md-flex justify-content-between align-items-center text-dark">
-                <div class="form-group mr-3">
-                    <label for="filter_status" class="mr-2">Status:</label>
-                    <select name="filter_status" id="filter_status" class="form-control form-select">
-                        <option value="" {% if not filter_status or filter_status == 'All' %}selected{% endif %}>All</option>
-                        <option value="Accepted" {% if filter_status == "Accepted" %}selected{% endif %}>Accepted</option>
-                        <option value="Waited" {% if filter_status == "Waited" %}selected{% endif %}>Waited</option>
-                        <option value="Cancelled" {% if filter_status == "Cancelled" %}selected{% endif %}>Cancelled</option>                  
-                    </select>
+
+<div class="filter-section">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">Status</label>
+      <select name="filter_status" class="form-select">
+        <option value="" {% if not filter_status %}selected{% endif %}>All</option>
+        <option value="Accepted" {% if filter_status == 'Accepted' %}selected{% endif %}>Accepted</option>
+        <option value="Waited" {% if filter_status == 'Waited' %}selected{% endif %}>Waiting</option>
+        <option value="Cancelled" {% if filter_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Date</label>
+      <input type="date" name="filter_date" class="form-control" value="{{ filter_date|default:'' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Doctor Name</label>
+      <input type="text" name="filter_doctor_name" class="form-control" placeholder="Search doctor..." value="{{ filter_doctor_name|default:'' }}">
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="card-custom">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>All Appointments</span>
+    <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>New Booking</a>
+  </div>
+  <div class="card-body p-0">
+    {% if appointments %}
+    <div class="table-responsive">
+      <table class="table table-custom">
+        <thead>
+          <tr>
+            <th>Doctor</th>
+            <th>Specialty</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Summary</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appointment in appointments %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <img src="{{ appointment.doctor.user.profile_avatar.url }}" class="avatar-sm" alt="">
+                <span class="fw-medium">Dr. {{ appointment.doctor.user.get_full_name }}</span>
+              </div>
+            </td>
+            <td>{{ appointment.doctor.specialty.name }}</td>
+            <td>{{ appointment.start_date|date:"d M Y" }}</td>
+            <td>{{ appointment.time }}</td>
+            <td>{{ appointment.summary|truncatechars:25 }}</td>
+            <td>
+              {% if appointment.status.status == 'Accepted' %}
+                <span class="badge-custom badge-accepted"><i class="bi bi-check-circle"></i> Accepted</span>
+              {% elif appointment.status.status == 'Waited' %}
+                <span class="badge-custom badge-waited"><i class="bi bi-clock"></i> Waiting</span>
+              {% elif appointment.status.status == 'Cancelled' %}
+                <span class="badge-custom badge-cancelled"><i class="bi bi-x-circle"></i> Cancelled</span>
+              {% endif %}
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#descModal{{ appointment.id }}">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Description Modal -->
+          <div class="modal fade modal-custom" id="descModal{{ appointment.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Appointment Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="form-group mr-3">
-                    <label for="filter_date" class="mr-2">Date:</label>
-                    <input type="date" name="filter_date" id="filter_date" class="form-control" value="{{ filter_date }}">
-                </div>
-                <div class="form-group mr-3">
-                    <label for="filter_doctor_name" class="mr-2">Doctor Name:</label>
-                    <input type="text" name="filter_doctor_name" id="filter_doctor_name" class="form-control" value="{% if filter_doctor_name is not None %}{{ filter_doctor_name }}{% endif %}">
-                </div>
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
-        </div>
-        <div class="table-div">
-            <div class="table-card">
-                <div class="tab-content pt-0">
-                    <div id="pat_appointments" class="tab-pane fade show active">
-                        <div class="card card-table mb-0">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-center mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Doctor</th>
-                                                <th>Appt Date</th>
-                                                <th>Start Time</th>
-                                                <th>Suammry</th>
-                                                <th>Description</th>
-                                                <th>status</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for appointment in appointments %}
-                                            <tr>
-                                                <td>
-                                                    <h2 class="table-avatar">
-                                                        <div class="avatar avatar-sm mr-2">
-                                                            <img class="avatar-img rounded-circle" src="{{appointment.doctor.user.profile_avatar.url}}" alt="User Image">
-                                                        </div>
-                                                        <b><a href="#" style="text-decoration:none;font:100px;">&nbsp;&nbsp;Dr. {{ appointment.doctor.user.first_name }} <span>&nbsp;&nbsp;<!--Dental--></span></a></b>
-                                                    </h2>
-                                                </td>
-                                                <td><span class="d-block" style="font-size:16px;">{{ appointment.start_date }}</span></td>
-                                                <td><span class="d-block" style="font-size:16px;">{{ appointment.time.time }}</span></td>
-                                                <td><span class="d-block" style="font-size:16px;">{{ appointment.summary }}</span></td>
-                                                <td>
-                                                    <button type="button" class="btn primary-color-background btn-primary" data-toggle="modal" data-target="#descriptionModal{{ appointment.id }}">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
-                                                </td>
-                                            
-                                                <td>
-                                                    {% if appointment.status.status == "Accepted" %}
-                                                        <span class="badge badge-pill bg-success-light" style="height:22px;font-size:14px;">{{appointment.status.status}}</span>
-                                                    {% elif appointment.status.status == "Waited" %}
-                                                        <span class="badge badge-pill bg-warning text-white" style="height:22px;font-size:14px;">{{appointment.status.status}}</span>
-                                                    {% elif appointment.status.status == "Cancelled" %}
-                                                        <span class="badge badge-pill bg-danger text-white" style="height:22px;font-size:14px;">{{appointment.status.status}}</span>
-                                                    {% else %}
-                                                        <span class="badge badge-pill bg-secondary" style="height:22px;font-size:14px;">{{appointment.status.status}}</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td class="text-right">
-                                                    
-                                                </td>
-                                            </tr>
-                                            <div class="modal fade" id="descriptionModal{{ appointment.id }}" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel{{ appointment.id }}" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title text-dark" id="descriptionModalLabel{{ appointment.id }}">Description</h5>
-                                                            <button type="button" class="close btn" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button> 
-                                                        </div>
-                                                        <div class="modal-body text-dark">
-                                                            {{ appointment.description }}
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn secondary-color-background text-white" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                <div class="modal-body">
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="{{ appointment.doctor.user.profile_avatar.url }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
+                    <div>
+                      <h6 class="mb-0">Dr. {{ appointment.doctor.user.get_full_name }}</h6>
+                      <small class="text-muted">{{ appointment.doctor.specialty.name }}</small>
                     </div>
+                  </div>
+                  <hr>
+                  <p><strong>Summary:</strong> {{ appointment.summary }}</p>
+                  <p><strong>Description:</strong> {{ appointment.description|default:"—" }}</p>
+                  <p><strong>Date:</strong> {{ appointment.start_date|date:"l, d F Y" }}</p>
+                  <p><strong>Time:</strong> {{ appointment.time }}</p>
                 </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
             </div>
-        </div>
-    </section>
-</main>
+          </div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <h5>No Appointments</h5>
+      <p class="text-muted">You haven't booked any appointments yet.</p>
+      <a href="{% url 'book_appointment' %}" class="btn btn-primary mt-2">Book Now</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
